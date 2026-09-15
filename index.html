@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sushil NP — Solutioning, Commerce &amp; Engineering</title>
+<meta name="description" content="Solutioning, consultation, Adobe Commerce, PHP engineering, website design and app development." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink: #0a0b0d;
+    --ink-2: #131519;
+    --ink-3: #1b1e24;
+    --paper: #f3f1ea;
+    --accent: #4d5bff;
+    --accent-dim: #2e37a8;
+    --line: rgba(243,241,234,0.14);
+    --line-strong: rgba(243,241,234,0.28);
+    --muted: rgba(243,241,234,0.55);
+    --display: 'Bricolage Grotesque', 'Inter', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Inter', -apple-system, sans-serif;
+    --skew: 0;
+    --spot: 30;
+  }
+  *{ box-sizing:border-box; }
+  html{ background:var(--ink); }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition-duration:0.001ms !important; }
+  }
+  body{
+    margin:0;
+    background:var(--ink);
+    color:var(--paper);
+    font-family:var(--sans);
+    overflow-x:hidden;
+    cursor: none;
+  }
+  @media (hover:none), (pointer:coarse){ body{ cursor:auto; } }
+  ::selection{ background:var(--accent); color:var(--paper); }
+  a{ color:inherit; text-decoration:none; }
+  img,svg{ display:block; max-width:100%; }
+  a:active, button:active{ transform:scale(0.94); transition:transform 0.15s ease; }
+
+  /* ---------- ambient moving spotlight ---------- */
+  .ambient{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background: radial-gradient(680px circle at 50% calc(var(--spot) * 1%), rgba(77,91,255,0.14), transparent 62%);
+  }
+
+  /* ---------- grain ---------- */
+  .grain{
+    position:fixed; inset:0; z-index:200; pointer-events:none;
+    opacity:0.035; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ---------- custom cursor ---------- */
+  .cursor{
+    position:fixed; top:0; left:0; z-index:500;
+    width:10px; height:10px; border-radius:50%;
+    background:var(--paper);
+    pointer-events:none;
+    transform:translate(-50%,-50%);
+    transition:width 0.25s cubic-bezier(.2,.8,.2,1), height 0.25s cubic-bezier(.2,.8,.2,1), background 0.25s ease;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-size:10px; letter-spacing:0.06em; color:var(--ink);
+    will-change:transform;
+  }
+  .cursor.view{ width:64px; height:64px; background:var(--accent); color:var(--paper); }
+  .cursor-ring{
+    position:fixed; top:0; left:0; z-index:499;
+    width:38px; height:38px; border-radius:50%; border:1px solid var(--line-strong);
+    pointer-events:none; transform:translate(-50%,-50%);
+    will-change:transform;
+  }
+  .cursor-ring.view{ border-color:var(--accent); }
+  @media (hover:none), (pointer:coarse){ .cursor,.cursor-ring{ display:none; } }
+
+  :focus-visible{ outline:1.5px solid var(--accent); outline-offset:3px; }
+
+  html.lock, html.lock body{ overflow:hidden; height:100%; }
+
+  /* ---------- intro gate ---------- */
+  .intro{ position:fixed; inset:0; z-index:400; }
+  .intro-panel{
+    position:absolute; left:0; right:0; height:50%; background:var(--ink);
+    transition: transform 1.05s cubic-bezier(.76,0,.24,1);
+  }
+  .intro-panel.top{ top:0; }
+  .intro-panel.bottom{ bottom:0; }
+  .intro.split .intro-panel.top{ transform: translateY(-102%); }
+  .intro.split .intro-panel.bottom{ transform: translateY(102%); }
+  .intro-copy{
+    position:absolute; inset:0; z-index:2;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:0 1.5rem; pointer-events:none;
+    transition:opacity 0.5s ease;
+  }
+  .intro.split .intro-copy{ opacity:0; }
+  .intro-line{
+    font-family:var(--display); font-weight:600; color:var(--paper);
+    font-size:clamp(1.5rem, 4.4vw, 2.7rem); max-width:19ch; line-height:1.32; margin:0;
+  }
+  .intro-line .struck{ text-decoration:line-through; text-decoration-color:var(--accent); text-decoration-thickness:3px; opacity:0.4; }
+  .intro-line .added{
+    color:var(--accent); font-style:italic; margin-left:0.45ch; opacity:0; display:inline-block;
+    transform:translateY(8px); transition:opacity 0.5s ease, transform 0.5s ease;
+  }
+  .intro-line .added.show{ opacity:1; transform:translateY(0); }
+  .intro-caret{ display:inline-block; width:2px; margin-left:2px; color:var(--accent); animation:blink 1s step-end infinite; }
+  @keyframes blink{ 50%{ opacity:0; } }
+  .intro-progress{
+    margin-top:2.4rem; display:flex; flex-direction:column; align-items:center; gap:0.7rem;
+    opacity:0; transition:opacity 0.5s ease;
+  }
+  .intro-progress.show{ opacity:1; }
+  .intro-progress-bar{
+    width:min(260px, 60vw); height:2px; background:var(--line); position:relative; overflow:hidden;
+  }
+  .intro-progress-bar span{
+    position:absolute; inset:0; width:0%; background:var(--accent); transition:width 0.15s linear;
+  }
+  .intro-progress-label{
+    font-family:var(--mono); font-size:0.72rem; letter-spacing:0.06em; color:var(--muted);
+  }
+
+
+
+  /* ---------- football ---------- */
+  .ball-canvas{ position:fixed; inset:0; z-index:160; pointer-events:none; }
+
+  /* ---------- header ---------- */
+  header.site{
+    position:fixed; inset-inline:0; top:0; z-index:100;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:1.4rem clamp(1.5rem, 4vw, 3.5rem);
+    mix-blend-mode:difference;
+  }
+  .logo{ font-family:var(--display); font-weight:700; font-size:1.35rem; }
+  .logo sup{ font-size:0.6em; }
+  nav.primary{ display:flex; gap:0.4rem; }
+  nav.primary a{
+    font-family:var(--mono); font-size:0.72rem; letter-spacing:0.04em;
+    padding:0.6rem 0.9rem; display:inline-block;
+    will-change:transform;
+  }
+  @media (max-width:800px){ nav.primary{ display:none; } }
+  .menu-btn{
+    display:none; flex-direction:column; gap:5px; width:2.6rem; height:2.6rem;
+    align-items:center; justify-content:center; background:none; border:none; cursor:pointer;
+  }
+  .menu-btn span{ width:22px; height:1px; background:var(--paper); display:block; }
+  @media (max-width:800px){ .menu-btn{ display:flex; } }
+
+  /* ---------- mobile menu ---------- */
+  .mobile-menu{
+    position:fixed; inset:0; z-index:90; background:var(--ink);
+    padding:7rem 1.6rem 2rem; display:flex; flex-direction:column;
+    transform:translateY(-100%); transition:transform 0.5s cubic-bezier(.2,.8,.2,1);
+  }
+  .mobile-menu.open{ transform:translateY(0); }
+  .mobile-menu a{ font-family:var(--display); font-size:2.4rem; padding:0.7rem 0; border-bottom:1px solid var(--line); }
+
+  /* ---------- scroll rig (skews on scroll velocity) ---------- */
+  #rig{
+    position:relative; z-index:1;
+    transform: skewY(calc(var(--skew) * 1deg));
+    transform-origin: 50% 50%;
+    will-change:transform;
+  }
+  section{ position:relative; }
+
+  .eyebrow{ font-family:var(--mono); font-size:0.72rem; letter-spacing:0.04em; color:var(--muted); }
+  .idx{ color:var(--accent); }
+
+  /* ---------- fold-on-exit machinery ---------- */
+  .dissolve{ position:relative; overflow:clip; }
+  .dissolve-content{ position:relative; z-index:2; will-change:opacity; }
+  .fold-panel{
+    position:absolute; left:0; right:0; height:50%; z-index:5; pointer-events:none;
+    background: var(--panel-bg, var(--ink));
+    will-change:transform;
+  }
+  .fold-panel.top{ top:0; transform-origin:50% 100%; transform:scaleY(0); }
+  .fold-panel.bottom{ bottom:0; transform-origin:50% 0%; transform:scaleY(0); }
+
+  /* ---------- hero ---------- */
+  .hero{
+    min-height:100svh; display:flex; flex-direction:column; justify-content:center;
+    padding:8rem clamp(1.5rem, 4vw, 3.5rem) 2.5rem;
+    position:relative; overflow:hidden;
+    background: var(--ink);
+    perspective: 1000px;
+  }
+  .hero-rig{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    z-index:0; opacity:0.92;
+  }
+  .hero-rig-inner{ width:min(48vh,70vw); will-change:transform; }
+  .hero-rig-inner svg{ width:100%; height:auto; }
+
+  .hero-content{ position:relative; z-index:2; }
+  .hero h1{
+    font-family:var(--display); font-weight:700;
+    font-size:clamp(2.6rem, 8vw, 6.4rem); line-height:0.95; letter-spacing:-0.02em;
+    margin:0; max-width:18ch;
+  }
+  .split-line{ display:block; overflow:hidden; }
+  .split-line span{ display:block; transform:translateY(115%); animation:rise 1s cubic-bezier(.2,.8,.2,1) forwards; }
+  .split-line:nth-child(1) span{ animation-delay:0.1s; }
+  .split-line:nth-child(2) span{ animation-delay:0.22s; }
+  @keyframes rise{ to{ transform:translateY(0); } }
+  .hero-sub{
+    margin-top:1.8rem; max-width:38ch; font-size:1.05rem; line-height:1.6; color:rgba(243,241,234,0.72);
+  }
+  .hero-bottom{
+    position:relative; z-index:2; margin-top:auto; padding-top:3rem;
+    display:flex; justify-content:space-between; align-items:baseline; gap:1rem; flex-wrap:wrap;
+  }
+  .hero-bottom .count{ font-family:var(--mono); font-size:0.75rem; color:var(--muted); }
+
+  /* ---------- scrub (continuous scroll-linked reveal) ---------- */
+  .scrub{
+    opacity: var(--sp, 0);
+    transform: translateY(calc((1 - var(--sp, 0)) * 52px)) scale(calc(0.94 + var(--sp, 0) * 0.06));
+    will-change: transform, opacity;
+  }
+
+  /* ---------- manifesto ---------- */
+  .manifesto{
+    background:var(--ink); border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+    padding:6rem clamp(1.5rem, 4vw, 3.5rem);
+  }
+  .manifesto p{
+    font-family:var(--display); font-weight:500; font-size:clamp(1.6rem, 3.6vw, 3rem);
+    line-height:1.15; letter-spacing:-0.01em; max-width:20ch; margin:0;
+  }
+  .manifesto .accent{ color:var(--accent); font-style:italic; }
+  .manifesto small{
+    display:block; margin-top:2rem; font-family:var(--mono); font-size:0.8rem; color:var(--muted); max-width:42ch; line-height:1.6;
+  }
+
+  /* ---------- expertise ---------- */
+  .expertise-wrap{ padding:6rem clamp(1.5rem, 4vw, 3.5rem) 4rem; }
+  .expertise-head{ display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; flex-wrap:wrap; margin-bottom:3rem; padding:1rem; margin-left:-1rem; margin-right:-1rem; }
+  .expertise-head h2{
+    font-family:var(--display); font-weight:700; font-size:clamp(2rem, 4.4vw, 3.6rem); line-height:1; margin:0.6rem 0 0;
+  }
+  .expertise-grid{ display:grid; grid-template-columns: 0.9fr 1.3fr; gap:3rem; align-items:start; }
+  .expertise-panel{ position:sticky; top:7rem; height:52vh; border:1px solid var(--line); overflow:hidden; background:var(--ink-2); }
+  .expertise-panel .diagram{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    opacity:0; transition:opacity 0.5s ease; padding:2.2rem;
+  }
+  .expertise-panel .diagram.active{ opacity:1; }
+  .expertise-panel svg{ width:100%; height:100%; }
+
+  .expertise-list{ border-top:1px solid var(--line-strong); }
+  .expertise-row{
+    display:grid; grid-template-columns: 3rem 1fr; gap:1.6rem; align-items:baseline;
+    padding:2rem 0; border-bottom:1px solid var(--line); cursor:pointer;
+    opacity: var(--rp, 0.45);
+    transform: translateX(calc((1 - var(--rp, 0.45)) * 26px)) scale(calc(0.97 + var(--rp, 0.45) * 0.03));
+    will-change: transform, opacity;
+  }
+  .expertise-row:hover, .expertise-row.active{ padding-left:0.8rem; }
+  .expertise-row .num{ font-family:var(--mono); font-size:0.85rem; color:var(--muted); }
+  .expertise-row.active .num, .expertise-row:hover .num{ color:var(--accent); }
+  .expertise-row h3{
+    font-family:var(--display); font-weight:600; font-size:clamp(1.5rem, 2.6vw, 2.3rem); margin:0; line-height:1.05;
+    transition:transform 0.4s cubic-bezier(.2,.8,.2,1), color 0.3s ease;
+  }
+  .expertise-row:hover h3, .expertise-row.active h3{ transform:translateX(6px); color:var(--accent); }
+  .expertise-row p{ margin:0.7rem 0 0; max-width:52ch; font-size:0.92rem; line-height:1.6; color:var(--muted); }
+
+  @media (max-width:900px){
+    .expertise-grid{ grid-template-columns:1fr; }
+    .expertise-panel{ position:relative; top:auto; height:38vh; }
+  }
+
+  /* ---------- showcase ---------- */
+  .showcase{
+    background:var(--ink-2); border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+    padding:7rem clamp(1.5rem, 4vw, 3.5rem); text-align:center;
+  }
+  .showcase-tag{ display:flex; justify-content:center; gap:0.5rem; }
+  .showcase h2{
+    font-family:var(--display); font-weight:700; font-size:clamp(2.2rem, 6vw, 4.6rem);
+    line-height:0.98; letter-spacing:-0.02em; margin:1.4rem auto 0; max-width:16ch;
+  }
+  .showcase p{ margin:1.6rem auto 0; max-width:46ch; color:var(--muted); line-height:1.65; font-size:0.98rem; }
+  .load-bar{ width:min(320px, 70vw); height:2px; background:var(--line); margin:2.6rem auto 0; position:relative; overflow:hidden; }
+  .load-bar span{ position:absolute; inset:0; width:38%; background:var(--accent); transform: translateX(calc(var(--lp, 0) * 1%)); }
+  .showcase-note{ margin-top:2rem; font-family:var(--mono); font-size:0.78rem; color:var(--muted); }
+  .showcase-note a{ color:var(--accent); border-bottom:1px solid var(--accent-dim); }
+  .showcase-note a:hover{ opacity:0.75; }
+
+  /* ---------- contact ---------- */
+  .contact{ padding:7rem clamp(1.5rem, 4vw, 3.5rem) 5rem; }
+  .contact-grid{ display:grid; grid-template-columns: 1.1fr 1fr; gap:3.5rem; }
+  .contact h2{
+    font-family:var(--display); font-weight:700; font-size:clamp(2.4rem, 6.4vw, 5.4rem); line-height:0.98; margin:1rem 0 0; max-width:11ch;
+  }
+  .contact-lead{ margin-top:1.6rem; max-width:32ch; color:var(--muted); line-height:1.6; }
+  .enquiry{ align-self:end; }
+  .enquiry .label{ display:block; font-family:var(--mono); font-size:0.7rem; color:var(--muted); margin-bottom:0.9rem; }
+  .enquiry-btn{
+    display:inline-flex; align-items:center; gap:0.6rem;
+    font-family:var(--display); font-weight:600; font-size:clamp(1.2rem, 2.2vw, 1.7rem);
+    padding:1rem 1.8rem; border:1.5px solid var(--line-strong); border-radius:999px;
+    transition:background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  }
+  .enquiry-btn:hover{ background:var(--accent); border-color:var(--accent); color:var(--paper); }
+  @media (max-width:800px){ .contact-grid{ grid-template-columns:1fr; } }
+
+  /* ---------- footer ---------- */
+  footer.site{ border-top:1px solid var(--line); overflow:hidden; }
+  .marquee{ display:flex; white-space:nowrap; padding:1.6rem 0; }
+  .marquee-track{ display:flex; gap:2.2rem; animation:scroll-left 22s linear infinite; }
+  .marquee:hover .marquee-track{ animation-play-state:paused; }
+  @keyframes scroll-left{ from{ transform:translateX(0);} to{ transform:translateX(-50%);} }
+  .marquee-track span{ font-family:var(--display); font-size:1.4rem; color:var(--muted); }
+  .marquee-track span.dot{ color:var(--accent); }
+  .foot-bottom{
+    border-top:1px solid var(--line); padding:1.6rem clamp(1.5rem, 4vw, 3.5rem);
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.6rem;
+    font-family:var(--mono); font-size:0.72rem; color:var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<div class="intro" id="intro">
+  <div class="intro-panel top"></div>
+  <div class="intro-panel bottom"></div>
+  <div class="intro-copy">
+    <p class="intro-line" id="introLine"><span id="typedText"></span><span class="intro-caret" id="introCaret">|</span></p>
+    <div class="intro-progress" id="introProgress">
+      <div class="intro-progress-bar"><span id="introProgressFill"></span></div>
+      <span class="intro-progress-label" id="introProgressLabel">Loading — 000%</span>
+    </div>
+  </div>
+</div>
+
+<div class="ambient" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+<div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
+<div class="cursor" id="cursor" aria-hidden="true"></div>
+
+<header class="site">
+  <a href="#hero" class="logo" data-magnet>sn<sup>®</sup></a>
+  <nav class="primary" aria-label="Primary">
+    <a href="#expertise" data-magnet>/expertise</a>
+    <a href="#showcase" data-magnet>/showcase</a>
+    <a href="#contact" data-magnet>/contact</a>
+  </nav>
+  <button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false">
+    <span></span><span></span>
+  </button>
+</header>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#expertise">/expertise</a>
+  <a href="#showcase">/showcase</a>
+  <a href="#contact">/contact</a>
+</div>
+
+<div id="rig">
+<main id="content">
+
+  <!-- HERO -->
+  <section id="hero" class="hero dissolve">
+    <div class="fold-panel top" aria-hidden="true"></div>
+    <div class="fold-panel bottom" aria-hidden="true"></div>
+    <div class="dissolve-content">
+      <div class="hero-rig" aria-hidden="true">
+        <div class="hero-rig-inner" id="heroRigInner">
+          <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+            <g id="heroBreakCube">
+              <polygon points="150,40 190,62 150,84 110,62" fill="#4d5bff"/>
+              <polygon points="190,62 190,106 150,128 150,84" fill="#2e37a8"/>
+              <polygon points="110,62 110,106 150,128 150,84" fill="#1b1e24"/>
+            </g>
+            <g>
+              <polygon points="110,106 150,128 110,150 70,128" fill="#1b1e24"/>
+              <polygon points="150,128 150,172 110,194 110,150" fill="#131519"/>
+              <polygon points="70,128 70,172 110,194 110,150" fill="#0a0b0d"/>
+            </g>
+            <g>
+              <polygon points="70,172 110,194 70,216 30,194" fill="#131519"/>
+              <polygon points="110,194 110,238 70,260 70,216" fill="#0a0b0d"/>
+              <polygon points="30,194 30,238 70,260 70,216" fill="#1b1e24"/>
+            </g>
+            <g opacity="0.85">
+              <polygon points="190,106 230,128 190,150 150,128" fill="#131519"/>
+              <polygon points="230,128 230,172 190,194 190,150" fill="#0a0b0d"/>
+              <polygon points="150,128 150,172 190,194 190,150" fill="#1b1e24"/>
+            </g>
+          </svg>
+        </div>
+      </div>
+      <div class="hero-content">
+        <h1>
+          <span class="split-line"><span>Systems, built</span></span>
+          <span class="split-line"><span>to hold weight.</span></span>
+        </h1>
+        <p class="hero-sub">I'm Sushil NP — solutioning and engineering across Adobe Commerce, PHP, web and mobile. I take the messy version of a problem and hand back something that runs.</p>
+      </div>
+      <div class="hero-bottom">
+        <span class="eyebrow">index — six disciplines, one desk</span>
+        <span class="count"><span id="scrollCount">000</span> — scroll to build ↓</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- MANIFESTO -->
+  <section class="manifesto dissolve">
+    <div class="fold-panel top" aria-hidden="true"></div>
+    <div class="fold-panel bottom" aria-hidden="true"></div>
+    <div class="dissolve-content">
+      <p class="scrub" data-scrub>Most technical problems are <span class="accent">business problems</span> wearing a disguise.</p>
+      <small>I figure out what has to be true before I write a single line — then the code is just the part that was always going to be easy.</small>
+    </div>
+  </section>
+
+  <!-- EXPERTISE -->
+  <section id="expertise" class="expertise-wrap">
+    <div class="expertise-head dissolve">
+      <div class="fold-panel top" aria-hidden="true"></div>
+      <div class="fold-panel bottom" aria-hidden="true"></div>
+      <div class="dissolve-content" style="display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; flex-wrap:wrap; width:100%;">
+        <div>
+          <p class="eyebrow"><span class="idx">01</span> — where I help</p>
+          <h2 class="scrub" data-scrub>Six disciplines.</h2>
+        </div>
+        <p class="eyebrow" style="max-width:26ch;">one way of working: understand fully, then build precisely.</p>
+      </div>
+    </div>
+
+    <div class="expertise-grid">
+      <div class="expertise-panel" id="expertisePanel">
+        <div class="diagram active" data-panel="0">
+          <svg viewBox="0 0 200 200"><g fill="none" stroke="#f3f1ea" stroke-width="1.4" opacity="0.85">
+            <circle cx="40" cy="100" r="14"/><circle cx="100" cy="50" r="14"/><circle cx="100" cy="150" r="14"/><circle cx="160" cy="100" r="14"/>
+            <path d="M54 100 L86 55 M54 100 L86 145 M114 50 L146 92 M114 150 L146 108"/>
+            <circle cx="100" cy="100" r="4" fill="#4d5bff" stroke="none"/>
+          </g></svg>
+        </div>
+        <div class="diagram" data-panel="1">
+          <svg viewBox="0 0 200 200"><g fill="none" stroke="#f3f1ea" stroke-width="1.4" opacity="0.85">
+            <path d="M40 70 h60 v34 h-24 l-10 14 v-14 h-26 z"/>
+            <path d="M100 96 h60 v34 h-26 v14 l-10-14 h-24 z" stroke="#4d5bff"/>
+          </g></svg>
+        </div>
+        <div class="diagram" data-panel="2">
+          <svg viewBox="0 0 200 200"><g fill="none" stroke="#f3f1ea" stroke-width="1.4" opacity="0.85">
+            <path d="M60 50 L60 150 M140 50 L140 150" stroke="#4d5bff"/>
+            <circle cx="60" cy="70" r="6"/><circle cx="140" cy="70" r="6"/>
+            <path d="M40 100 h120 M40 130 h120"/>
+          </g></svg>
+        </div>
+        <div class="diagram" data-panel="3">
+          <svg viewBox="0 0 200 200"><g fill="none" stroke="#f3f1ea" stroke-width="1.6" opacity="0.9">
+            <path d="M76 46 q-24 0 -24 24 v14 q0 12 -12 14 q12 2 12 14 v14 q0 24 24 24" stroke="#4d5bff"/>
+            <path d="M124 46 q24 0 24 24 v14 q0 12 12 14 q-12 2 -12 14 v14 q0 24 -24 24"/>
+          </g></svg>
+        </div>
+        <div class="diagram" data-panel="4">
+          <svg viewBox="0 0 200 200"><g fill="none" stroke="#f3f1ea" stroke-width="1.4" opacity="0.85">
+            <rect x="40" y="50" width="120" height="100" rx="2"/>
+            <path d="M40 74 h120" />
+            <path d="M62 96 h50 M62 114 h76 M62 132 h30" stroke="#4d5bff"/>
+          </g></svg>
+        </div>
+        <div class="diagram" data-panel="5">
+          <svg viewBox="0 0 200 200"><g fill="none" stroke="#f3f1ea" stroke-width="1.4" opacity="0.85">
+            <rect x="70" y="40" width="60" height="120" rx="10"/>
+            <path d="M85 60 h30 M85 80 h30 M85 100 h20" stroke="#4d5bff"/>
+            <circle cx="100" cy="140" r="6"/>
+          </g></svg>
+        </div>
+      </div>
+
+      <div class="expertise-list" id="expertiseList">
+        <div class="expertise-row active" data-panel="0" data-scrub-row>
+          <span class="num">01</span>
+          <div>
+            <h3 data-glitch="Solutioning">Solutioning</h3>
+            <p>Turning an ambiguous business requirement into a concrete technical plan — architecture, trade-offs, and a build sequence that de-risks the work before it starts.</p>
+          </div>
+        </div>
+        <div class="expertise-row" data-panel="1" data-scrub-row>
+          <span class="num">02</span>
+          <div>
+            <h3 data-glitch="Consultation">Consultation</h3>
+            <p>Independent advisory on platform choice, technical roadmaps, and where a system is quietly costing you more than it should.</p>
+          </div>
+        </div>
+        <div class="expertise-row" data-panel="2" data-scrub-row>
+          <span class="num">03</span>
+          <div>
+            <h3 data-glitch="Adobe Commerce">Adobe Commerce</h3>
+            <p>Storefront builds, custom modules, upgrades and performance work on Adobe Commerce and Magento — for merchants who've outgrown a template.</p>
+          </div>
+        </div>
+        <div class="expertise-row" data-panel="3" data-scrub-row>
+          <span class="num">04</span>
+          <div>
+            <h3 data-glitch="PHP Engineering">PHP Engineering</h3>
+            <p>Custom PHP applications, internal tools and integrations — built to be maintained by a team, not just shipped once and left alone.</p>
+          </div>
+        </div>
+        <div class="expertise-row" data-panel="4" data-scrub-row>
+          <span class="num">05</span>
+          <div>
+            <h3 data-glitch="Website Design">Website Design</h3>
+            <p>Interfaces built for clarity first — considered typography and layout in service of what a visitor actually came to do.</p>
+          </div>
+        </div>
+        <div class="expertise-row" data-panel="5" data-scrub-row>
+          <span class="num">06</span>
+          <div>
+            <h3 data-glitch="App Development">App Development</h3>
+            <p>Mobile and web applications carried from a rough concept through to a released, supportable product.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SHOWCASE -->
+  <section id="showcase" class="showcase dissolve" style="--panel-bg:var(--ink-2);">
+    <div class="fold-panel top" aria-hidden="true"></div>
+    <div class="fold-panel bottom" aria-hidden="true"></div>
+    <div class="dissolve-content">
+      <p class="showcase-tag eyebrow"><span class="idx">02</span> — selected work</p>
+      <h2 class="scrub" data-scrub>The showcase is still loading.</h2>
+      <p>I'd rather ship a handful of engagements I'm genuinely proud of than fill this page early. This section unlocks once the first cases are ready to present.</p>
+      <div class="load-bar" aria-hidden="true" id="loadBar"><span></span></div>
+      <p class="showcase-note">Want proof sooner? <a href="#contact">ask me directly</a> — happy to walk you through recent work in a call.</p>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="contact dissolve">
+    <div class="fold-panel top" aria-hidden="true"></div>
+    <div class="fold-panel bottom" aria-hidden="true"></div>
+    <div class="dissolve-content">
+      <p class="eyebrow"><span class="idx">03</span> — say hello</p>
+      <div class="contact-grid">
+        <div>
+          <h2 class="scrub" data-scrub>Bring me the hard version.</h2>
+          <p class="contact-lead">The brief that's ambiguous, the storefront that's slow, the app that needs designing <em>and</em> building. That's usually where I do my best work.</p>
+        </div>
+        <div class="enquiry">
+          <span class="label">Get in touch</span>
+          <a class="enquiry-btn" href="mailto:sushiln398@gmail.com?subject=Project%20enquiry" data-cursor="view" data-magnet>Send an enquiry</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site">
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <span>Solutioning</span><span class="dot">•</span><span>Consultation</span><span class="dot">•</span><span>Adobe Commerce</span><span class="dot">•</span><span>PHP</span><span class="dot">•</span><span>Web Design</span><span class="dot">•</span><span>App Development</span><span class="dot">•</span>
+      <span>Solutioning</span><span class="dot">•</span><span>Consultation</span><span class="dot">•</span><span>Adobe Commerce</span><span class="dot">•</span><span>PHP</span><span class="dot">•</span><span>Web Design</span><span class="dot">•</span><span>App Development</span><span class="dot">•</span>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <span>© 2026 Sushil NP. All rights reserved.</span>
+    <span>Built by hand, not by template.</span>
+  </div>
+</footer>
+</div><!-- /#rig -->
+
+<script>
+(function(){
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var isTouch = window.matchMedia('(hover:none), (pointer:coarse)').matches;
+  var root = document.documentElement;
+
+  /* ---------------- intro gate: type, strike, split ---------------- */
+  root.classList.add('lock');
+  var intro = document.getElementById('intro');
+  var typedText = document.getElementById('typedText');
+  var introCaret = document.getElementById('introCaret');
+  var introProgress = document.getElementById('introProgress');
+  var introProgressFill = document.getElementById('introProgressFill');
+  var introProgressLabel = document.getElementById('introProgressLabel');
+  var introPrefix = 'Are you planning to build something ';
+  var introWord = 'new';
+  var introSuffix = '?';
+  var introFull = introPrefix + introWord + introSuffix;
+  var entered = false;
+  var progressTimer = null;
+
+  function enterSite(){
+    if (entered) return;
+    entered = true;
+    clearInterval(progressTimer);
+    intro.classList.add('split');
+    root.classList.remove('lock');
+    setTimeout(function(){ intro.style.display = 'none'; }, 1150);
+  }
+
+  function runProgress(){
+    introProgress.classList.add('show');
+    var pct = 0;
+    progressTimer = setInterval(function(){
+      pct += Math.random() * 14 + 5;
+      if (pct >= 100){
+        pct = 100;
+        introProgressFill.style.width = '100%';
+        introProgressLabel.textContent = 'Loading — 100%';
+        clearInterval(progressTimer);
+        setTimeout(enterSite, 350);
+        return;
+      }
+      introProgressFill.style.width = pct + '%';
+      introProgressLabel.textContent = 'Loading — ' + String(Math.floor(pct)).padStart(3, '0') + '%';
+    }, 160);
+  }
+
+  function runIntro(){
+    if (reduced){
+      typedText.textContent = introPrefix;
+      var s = document.createElement('span'); s.className = 'struck'; s.textContent = introWord;
+      var a = document.createElement('span'); a.className = 'added show'; a.id = 'addedWord'; a.textContent = 'extraordinary';
+      typedText.appendChild(s); typedText.appendChild(a); typedText.appendChild(document.createTextNode(introSuffix));
+      introCaret.style.display = 'none';
+      runProgress();
+      return;
+    }
+    var i = 0;
+    (function typeChar(){
+      if (i <= introFull.length){
+        typedText.textContent = introFull.slice(0, i);
+        i++;
+        setTimeout(typeChar, 34);
+      } else {
+        setTimeout(strikeWord, 550);
+      }
+    })();
+
+    function strikeWord(){
+      typedText.innerHTML = introPrefix + '<span class="struck">' + introWord + '</span><span class="added" id="addedWord">extraordinary</span>' + introSuffix;
+      setTimeout(function(){
+        var added = document.getElementById('addedWord');
+        if (added) added.classList.add('show');
+      }, 220);
+      setTimeout(function(){
+        introCaret.style.display = 'none';
+        runProgress();
+      }, 1100);
+    }
+  }
+  runIntro();
+
+  /* clicking (or a keypress) skips straight to the end of the loading bar */
+  intro.addEventListener('click', function(){
+    if (!entered) enterSite();
+  }, { passive:true });
+  window.addEventListener('keydown', function(e){
+    if (!entered && (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown')) enterSite();
+  });
+
+  /* custom cursor + trailing ring */
+  if (!isTouch){
+    var cursor = document.getElementById('cursor');
+    var ring = document.getElementById('cursorRing');
+    var mx = 0, my = 0, rx = 0, ry = 0;
+    window.addEventListener('mousemove', function(e){
+      mx = e.clientX; my = e.clientY;
+      cursor.style.transform = 'translate('+mx+'px,'+my+'px) translate(-50%,-50%)';
+    });
+    document.querySelectorAll('[data-cursor="view"]').forEach(function(el){
+      el.addEventListener('mouseenter', function(){ cursor.classList.add('view'); cursor.textContent = 'SEND'; ring.classList.add('view'); });
+      el.addEventListener('mouseleave', function(){ cursor.classList.remove('view'); cursor.textContent=''; ring.classList.remove('view'); });
+    });
+    document.querySelectorAll('a, button').forEach(function(el){
+      el.addEventListener('mouseenter', function(){ ring.style.width='50px'; ring.style.height='50px'; });
+      el.addEventListener('mouseleave', function(){ ring.style.width='38px'; ring.style.height='38px'; });
+    });
+    (function ringLoop(){
+      rx += (mx - rx) * 0.18;
+      ry += (my - ry) * 0.18;
+      ring.style.transform = 'translate('+rx+'px,'+ry+'px) translate(-50%,-50%)';
+      requestAnimationFrame(ringLoop);
+    })();
+  }
+
+  /* magnetic elements (desktop only) */
+  if (!isTouch){
+    document.querySelectorAll('[data-magnet]').forEach(function(el){
+      el.addEventListener('mousemove', function(e){
+        var r = el.getBoundingClientRect();
+        var ox = (e.clientX - (r.left + r.width/2)) * 0.35;
+        var oy = (e.clientY - (r.top + r.height/2)) * 0.35;
+        el.style.transform = 'translate('+ox+'px,'+oy+'px)';
+      });
+      el.addEventListener('mouseleave', function(){ el.style.transform = 'translate(0,0)'; });
+    });
+  }
+
+  /* mobile menu */
+  var menuBtn = document.getElementById('menuBtn');
+  var mobileMenu = document.getElementById('mobileMenu');
+  menuBtn.addEventListener('click', function(){
+    var open = mobileMenu.classList.toggle('open');
+    menuBtn.setAttribute('aria-expanded', open);
+  });
+  mobileMenu.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){ mobileMenu.classList.remove('open'); });
+  });
+
+  /* expertise sticky panel sync (hover, desktop) */
+  var rows = document.querySelectorAll('.expertise-row');
+  var diagrams = document.querySelectorAll('.diagram');
+  function setActive(idx){
+    rows.forEach(function(r){ r.classList.toggle('active', r.dataset.panel === String(idx)); });
+    diagrams.forEach(function(d){ d.classList.toggle('active', d.dataset.panel === String(idx)); });
+  }
+  rows.forEach(function(row){
+    row.addEventListener('mouseenter', function(){ setActive(row.dataset.panel); });
+  });
+  var rowActiveObserver = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if (entry.isIntersecting){ setActive(entry.target.dataset.panel); }
+    });
+  }, { rootMargin:'-45% 0px -45% 0px', threshold:0 });
+  rows.forEach(function(row){ rowActiveObserver.observe(row); });
+
+  /* glitch/scramble hover */
+  if (!reduced){
+    var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    document.querySelectorAll('[data-glitch]').forEach(function(el){
+      var original = el.dataset.glitch;
+      el.addEventListener('mouseenter', function(){
+        var iterations = 0;
+        clearInterval(el._glitchIv);
+        el._glitchIv = setInterval(function(){
+          el.textContent = original.split('').map(function(ch, i){
+            if (ch === ' ') return ' ';
+            if (i < iterations) return original[i];
+            return chars[Math.floor(Math.random()*chars.length)];
+          }).join('');
+          iterations += 1;
+          if (iterations > original.length){ clearInterval(el._glitchIv); el.textContent = original; }
+        }, 32);
+      });
+      el.addEventListener('mouseleave', function(){ clearInterval(el._glitchIv); el.textContent = original; });
+    });
+  }
+
+  /* ---------------- section exit: fold shut then split apart as you scroll past ---------------- */
+  var dissolveEls = Array.prototype.slice.call(document.querySelectorAll('.dissolve'));
+  var dissolveRigs = dissolveEls.map(function(el){
+    return {
+      el: el,
+      content: el.querySelector('.dissolve-content'),
+      topPanel: el.querySelector('.fold-panel.top'),
+      bottomPanel: el.querySelector('.fold-panel.bottom')
+    };
+  });
+  if (reduced){
+    dissolveRigs.forEach(function(rig){
+      if (rig.content) rig.content.style.opacity = 1;
+      if (rig.topPanel) rig.topPanel.style.display = 'none';
+      if (rig.bottomPanel) rig.bottomPanel.style.display = 'none';
+    });
+  }
+
+  /* ---------------- master scroll-driven transform loop ---------------- */
+  if (reduced){
+    document.querySelectorAll('[data-scrub]').forEach(function(el){ el.style.opacity = 1; el.style.transform = 'none'; });
+    document.querySelectorAll('[data-scrub-row]').forEach(function(el){ el.style.opacity = 1; el.style.transform = 'none'; });
+    return;
+  }
+
+  var scrubEls = Array.prototype.slice.call(document.querySelectorAll('[data-scrub]'));
+  var rowEls = Array.prototype.slice.call(document.querySelectorAll('[data-scrub-row]'));
+  var loadBar = document.getElementById('loadBar');
+  var scrollCountEl = document.getElementById('scrollCount');
+  var heroRigInner = document.getElementById('heroRigInner');
+  var showcaseSection = document.getElementById('showcase');
+
+  var lastY = window.scrollY;
+  var skewCurrent = 0;
+  var spotCurrent = 30;
+  var tiltX = 0, tiltY = 0, tiltTX = 0, tiltTY = 0;
+  var bob = 0;
+  var dissolveEase = dissolveRigs.map(function(){ return 0; }); // smoothed opacity per section
+
+  if (!isTouch){
+    window.addEventListener('mousemove', function(e){
+      var wx = (e.clientX / window.innerWidth - 0.5) * 2;
+      var wy = (e.clientY / window.innerHeight - 0.5) * 2;
+      tiltTX = wx * 10;
+      tiltTY = wy * -10;
+    });
+  }
+
+  function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
+  function lerp(a, b, n){ return a + (b - a) * n; }
+
+  function frame(){
+    var y = window.scrollY;
+    var delta = y - lastY;
+    lastY = y;
+
+    var targetSkew = clamp(delta * 0.5, -6, 6);
+    skewCurrent = lerp(skewCurrent, targetSkew, 0.14);
+    root.style.setProperty('--skew', skewCurrent.toFixed(3));
+
+    var maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+    var overallProgress = maxScroll > 0 ? clamp(y / maxScroll, 0, 1) : 0;
+    var targetSpot = 18 + overallProgress * 64;
+    spotCurrent = lerp(spotCurrent, targetSpot, 0.08);
+    root.style.setProperty('--spot', spotCurrent.toFixed(2));
+    scrollCountEl.textContent = String(Math.round(overallProgress * 100)).padStart(3,'0');
+
+    tiltX = lerp(tiltX, tiltTX, 0.08);
+    tiltY = lerp(tiltY, tiltTY, 0.08);
+    bob += 0.02;
+    var bobY = Math.sin(bob) * 10;
+    var scrollRot = y * 0.06;
+    heroRigInner.style.transform =
+      'perspective(900px) rotateX('+tiltY.toFixed(2)+'deg) rotateY('+tiltX.toFixed(2)+'deg) rotateZ('+scrollRot.toFixed(2)+'deg) translateY('+bobY.toFixed(2)+'px)';
+
+    var vh = window.innerHeight;
+    scrubEls.forEach(function(el){
+      var r = el.getBoundingClientRect();
+      var raw = 1 - (r.top - vh * 0.15) / (vh * 0.7);
+      var sp = clamp(raw, 0, 1);
+      el.style.setProperty('--sp', sp.toFixed(3));
+    });
+
+    rowEls.forEach(function(el){
+      var r = el.getBoundingClientRect();
+      var center = r.top + r.height / 2;
+      var dist = Math.abs(center - vh / 2) / (vh / 2);
+      var rp = clamp(1 - dist, 0.35, 1);
+      el.style.setProperty('--rp', rp.toFixed(3));
+    });
+
+    if (showcaseSection){
+      var sr = showcaseSection.getBoundingClientRect();
+      var sraw = 1 - (sr.top - vh * 0.2) / (vh * 0.6);
+      var sp2 = clamp(sraw, 0, 1);
+      loadBar.style.setProperty('--lp', Math.round(sp2 * 260));
+    }
+
+    /* each section folds shut (panels close over it) then splits apart as you scroll past */
+    dissolveRigs.forEach(function(rig, i){
+      var r = rig.el.getBoundingClientRect();
+      var progress = r.top < 0 ? clamp(-r.top / (r.height * 0.9), 0, 1) : 0;
+      dissolveEase[i] = lerp(dissolveEase[i], progress, 0.09);
+      var p = dissolveEase[i];
+      var closeAmt = clamp(p / 0.32, 0, 1);
+      var travel = clamp((p - 0.32) / 0.68, 0, 1);
+      if (rig.content){
+        rig.content.style.opacity = clamp(1 - closeAmt * 2.4, 0, 1).toFixed(3);
+      }
+      if (rig.topPanel && rig.bottomPanel){
+        rig.topPanel.style.transform = 'scaleY(' + closeAmt.toFixed(3) + ') translateY(' + (-travel * 140).toFixed(1) + 'px)';
+        rig.bottomPanel.style.transform = 'scaleY(' + closeAmt.toFixed(3) + ') translateY(' + (travel * 140).toFixed(1) + 'px)';
+      }
+    });
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+
+<script>
+/* ---------------- a kickable football: falls, bounces off the screen edges,
+   and gets kicked by the cursor (or a finger) swiping through it ---------------- */
+(function(){
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  var canvas = document.createElement('canvas');
+  canvas.className = 'ball-canvas';
+  document.body.appendChild(canvas);
+  var ctx = canvas.getContext('2d');
+
+  function resize(){
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = window.innerWidth * dpr;
+    canvas.height = window.innerHeight * dpr;
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  var R_DEFAULT = 46;
+  var GRAVITY = 0.55;
+  var BOUNCE = 0.68;
+  var FLOOR_FRICTION = 0.985;
+
+  var ball = { x: 0, y: -80, vx: 0, vy: 0, angle: 0, alpha: 1, R: R_DEFAULT, active: false };
+
+  var mouseX = -9999, mouseY = -9999, prevMouseX = -9999, prevMouseY = -9999;
+  function trackPointer(x, y){ mouseX = x; mouseY = y; }
+  window.addEventListener('mousemove', function(e){ trackPointer(e.clientX, e.clientY); }, { passive:true });
+  window.addEventListener('touchmove', function(e){
+    if (e.touches && e.touches[0]) trackPointer(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive:true });
+
+  function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
+
+  /* a fading blue trail that follows the cursor/finger around the page */
+  var trail = [];
+  var lastTrailX = null, lastTrailY = null;
+
+  function updateTrail(){
+    if (mouseX < 0 || mouseY < 0) return;
+    if (lastTrailX === null || Math.hypot(mouseX - lastTrailX, mouseY - lastTrailY) > 5){
+      trail.push({ x: mouseX, y: mouseY, alpha: 1 });
+      lastTrailX = mouseX; lastTrailY = mouseY;
+      if (trail.length > 26) trail.shift();
+    }
+    for (var i = trail.length - 1; i >= 0; i--){
+      trail[i].alpha -= 0.045;
+      if (trail[i].alpha <= 0) trail.splice(i, 1);
+    }
+  }
+
+  function drawTrail(){
+    for (var i = 0; i < trail.length; i++){
+      var p = trail[i];
+      var r = 2 + (i / trail.length) * 9;
+      ctx.beginPath();
+      ctx.fillStyle = 'rgba(77,91,255,' + (p.alpha * 0.55).toFixed(3) + ')';
+      ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function kickToward(px, py, power){
+    var dx = ball.x - px, dy = ball.y - py;
+    var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+    var nx = dx / dist, ny = dy / dist;
+    ball.vx += nx * power;
+    ball.vy += ny * power - power * 0.35;
+  }
+
+  /* the piece is the hero's own top cube. Scroll past it and it breaks off;
+     scroll back up and it slowly finds its way home and rejoins the stack. */
+  var heroSection = document.getElementById('hero');
+  var heroPiece = document.getElementById('heroBreakCube');
+  var state = 'idle'; // 'idle' -> 'broken' -> 'rejoining' -> back to 'idle'
+
+  window.addEventListener('click', function(e){
+    if (state !== 'broken') return;
+    var dist = Math.hypot(e.clientX - ball.x, e.clientY - ball.y);
+    if (dist < ball.R + 70) kickToward(e.clientX, e.clientY, 9);
+  });
+
+  function heroProgress(){
+    if (!heroSection) return 0;
+    var r = heroSection.getBoundingClientRect();
+    return r.top < 0 ? clamp(-r.top / r.height, 0, 1) : 0;
+  }
+
+  /* the drawn piece's "radius" is derived from the real hero cube's current
+     on-screen size (which changes with viewport and its own 3D tilt), so
+     there's never a size mismatch when it breaks off or rejoins */
+  function pieceRadius(rect){
+    return Math.max(18, rect.height / 2);
+  }
+
+  function breakOff(){
+    var pieceRect = heroPiece.getBoundingClientRect();
+    ball.x = pieceRect.left + pieceRect.width / 2;
+    ball.y = pieceRect.top + pieceRect.height / 2;
+    ball.R = pieceRadius(pieceRect);
+    ball.vx = (Math.random() - 0.5) * 2;
+    ball.vy = 0.5;
+    ball.alpha = 1;
+    ball.active = true;
+    state = 'broken';
+    heroPiece.style.transition = 'opacity 0.25s ease';
+    heroPiece.style.opacity = '0';
+  }
+
+  function drawBall(){
+    var s = ball.R;
+    ctx.save();
+    ctx.globalAlpha = ball.alpha;
+    ctx.translate(ball.x, ball.y);
+    ctx.rotate(ball.angle);
+
+    /* top face */
+    ctx.beginPath();
+    ctx.moveTo(0, -s);
+    ctx.lineTo(s * 0.86, -s * 0.5);
+    ctx.lineTo(0, 0);
+    ctx.lineTo(-s * 0.86, -s * 0.5);
+    ctx.closePath();
+    ctx.fillStyle = '#4d5bff';
+    ctx.fill();
+
+    /* left face */
+    ctx.beginPath();
+    ctx.moveTo(-s * 0.86, -s * 0.5);
+    ctx.lineTo(-s * 0.86, s * 0.5);
+    ctx.lineTo(0, s);
+    ctx.lineTo(0, 0);
+    ctx.closePath();
+    ctx.fillStyle = '#1b1e24';
+    ctx.fill();
+
+    /* right face */
+    ctx.beginPath();
+    ctx.moveTo(s * 0.86, -s * 0.5);
+    ctx.lineTo(s * 0.86, s * 0.5);
+    ctx.lineTo(0, s);
+    ctx.lineTo(0, 0);
+    ctx.closePath();
+    ctx.fillStyle = '#131519';
+    ctx.fill();
+
+    /* edge outline, matching the hero rig's thin hairline look */
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(243,241,234,0.22)';
+    ctx.beginPath();
+    ctx.moveTo(0, -s);
+    ctx.lineTo(s * 0.86, -s * 0.5);
+    ctx.lineTo(s * 0.86, s * 0.5);
+    ctx.lineTo(0, s);
+    ctx.lineTo(-s * 0.86, s * 0.5);
+    ctx.lineTo(-s * 0.86, -s * 0.5);
+    ctx.closePath();
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  function easeInOutCubic(t){
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  }
+
+  var rejoin = null; // { fromX, fromY, fromAngle, fromR, toX, toY, toR, startTime }
+
+  function startRejoin(){
+    var targetRect = heroPiece.getBoundingClientRect();
+    rejoin = {
+      fromX: ball.x, fromY: ball.y, fromAngle: ball.angle, fromR: ball.R,
+      toX: targetRect.left + targetRect.width / 2,
+      toY: targetRect.top + targetRect.height / 2,
+      toR: pieceRadius(targetRect),
+      startTime: performance.now()
+    };
+    state = 'rejoining';
+  }
+
+  function loop(){
+    var vw = window.innerWidth, vh = window.innerHeight;
+    ctx.clearRect(0, 0, vw, vh);
+
+    updateTrail();
+    drawTrail();
+
+    if (heroSection && heroPiece){
+      var progress = heroProgress();
+      if (state === 'idle' && progress > 0.1){
+        breakOff();
+      } else if (state === 'broken' && progress < 0.06){
+        startRejoin();
+      } else if (state === 'rejoining' && progress > 0.12){
+        state = 'broken'; // scrolled back down mid-return — resume falling
+        ball.vx = (Math.random() - 0.5) * 2;
+        ball.vy = 0;
+        ball.alpha = 1;
+        rejoin = null;
+      }
+    }
+
+    if (state === 'broken'){
+      var mvx = clamp(mouseX - prevMouseX, -45, 45);
+      var mvy = clamp(mouseY - prevMouseY, -45, 45);
+      var d = Math.hypot(mouseX - ball.x, mouseY - ball.y);
+      if (d < ball.R + 20 && (Math.abs(mvx) > 1.2 || Math.abs(mvy) > 1.2)){
+        ball.vx += mvx * 0.22;
+        ball.vy += mvy * 0.22 - 1.4;
+      }
+      prevMouseX = mouseX; prevMouseY = mouseY;
+
+      ball.vy += GRAVITY;
+      ball.x += ball.vx;
+      ball.y += ball.vy;
+      ball.angle += ball.vx * 0.03;
+
+      if (ball.x - ball.R < 0){ ball.x = ball.R; ball.vx = -ball.vx * BOUNCE; }
+      if (ball.x + ball.R > vw){ ball.x = vw - ball.R; ball.vx = -ball.vx * BOUNCE; }
+      if (ball.y - ball.R < 0){ ball.y = ball.R; ball.vy = -ball.vy * BOUNCE; }
+      if (ball.y + ball.R > vh){
+        ball.y = vh - ball.R;
+        ball.vy = -ball.vy * BOUNCE;
+        ball.vx *= FLOOR_FRICTION;
+        if (Math.abs(ball.vy) < 0.6) ball.vy = 0;
+      }
+      ball.vx *= 0.999;
+
+      drawBall();
+    } else if (state === 'rejoining' && rejoin){
+      var duration = 1200;
+      var t = clamp((performance.now() - rejoin.startTime) / duration, 0, 1);
+      var e = easeInOutCubic(t);
+
+      ball.x = rejoin.fromX + (rejoin.toX - rejoin.fromX) * e;
+      ball.y = rejoin.fromY + (rejoin.toY - rejoin.fromY) * e;
+      ball.angle = rejoin.fromAngle * (1 - e);
+      ball.R = rejoin.fromR + (rejoin.toR - rejoin.fromR) * e;
+      ball.alpha = t < 0.75 ? 1 : clamp(1 - (t - 0.75) / 0.25, 0, 1);
+
+      if (t >= 1){
+        state = 'idle';
+        ball.active = false;
+        rejoin = null;
+        heroPiece.style.transition = 'opacity 0.45s ease';
+        heroPiece.style.opacity = '1';
+      } else {
+        drawBall();
+      }
+    }
+
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+})();
+</script>
+
+</body>
+</html>
